@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인천 함박마을 평화 공존 프로젝트</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2pdf.js CDN (PDF 저장용) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col items-center justify-center p-2 sm:p-4">
+
+    <!-- 메인 컨테이너 -->
+    <div id="app" class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col min-h-[85vh]">
+        
+        <!-- [Step 0] 오프닝 및 인적사항 화면 -->
+        <div id="step-0" class="p-6 flex flex-col justify-between flex-grow">
+            <div>
+                <!-- 11월 6일 상징 오프닝 화면 배너 -->
+                <div class="bg-indigo-600 text-white p-4 rounded-xl text-center mb-6 shadow-md">
+                    <span class="bg-indigo-500 text-xs px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider">11월 6일 현장체험학습</span>
+                    <h1 class="text-xl font-bold mt-2">인천 함박마을 평화 공존 프로젝트</h1>
+                    <p class="text-xs text-indigo-100 mt-1">역사 속 유랑민에서 우리 이웃으로</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">학교</label>
+                        <input type="text" id="school" placeholder="예) 강서중" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">학년</label>
+                            <input type="text" id="grade" placeholder="1" class="w-full px-3 py-2 border rounded-lg text-sm text-center focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">반</label>
+                            <input type="text" id="klass" placeholder="반" class="w-full px-3 py-2 border rounded-lg text-sm text-center focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">번호</label>
+                            <input type="text" id="number" placeholder="번호" class="w-full px-3 py-2 border rounded-lg text-sm text-center focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">이름</label>
+                        <input type="text" id="name" placeholder="이름 입력" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+
+                    <!-- 캐릭터 선택 -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">나의 탐방 캐릭터 선택</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="border p-3 rounded-xl flex items-center space-x-2 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="character" value="고려인 동포 캐릭터" checked class="text-indigo-600">
+                                <span class="text-sm font-medium">🧑‍🌾 고려인 역사 지킴이</span>
+                            </label>
+                            <label class="border p-3 rounded-xl flex items-center space-x-2 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="character" value="세계시민 탐험가 캐릭터" class="text-indigo-600">
+                                <span class="text-sm font-medium">🌍 세계시민 탐험가</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="startApp()" class="mt-6 w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg">
+                활동 시작하기 🚀
+            </button>
+        </div>
+
+        <!-- [메인 활동 인터페이스] (기본 숨김 상태) -->
+        <div id="main-content" class="hidden flex-col flex-grow">
+            <!-- 상단 헤더 & 뱃지 현황 -->
+            <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
+                <div>
+                    <h2 id="user-info-display" class="text-sm font-bold">홍길동 (1학년 1반)</h2>
+                    <p class="text-xs text-indigo-300">함박마을 평화 공존 탐방기</p>
+                </div>
+                <div id="badge-container" class="flex space-x-1">
+                    <span class="text-xs bg-indigo-800 text-indigo-300 px-2 py-1 rounded" id="badge-1">🏆 역사</span>
+                    <span class="text-xs bg-indigo-800 text-indigo-300 px-2 py-1 rounded" id="badge-2">🏘️ 마을</span>
+                    <span class="text-xs bg-indigo-800 text-indigo-300 px-2 py-1 rounded" id="badge-3">🃏 카드</span>
+                    <span class="text-xs bg-indigo-800 text-indigo-300 px-2 py-1 rounded" id="badge-4">🍲 미식</span>
+                </div>
+            </div>
+
+            <!-- 탭 네비게이션 -->
+            <div class="flex border-b bg-slate-100 overflow-x-auto">
+                <button onclick="switchTab(1)" id="tab-btn-1" class="flex-1 py-3 px-3 text-xs font-bold text-indigo-600 border-b-2 border-indigo-600 whitespace-nowrap">1. 역사관</button>
+                <button onclick="switchTab(2)" id="tab-btn-2" class="flex-1 py-3 px-3 text-xs font-semibold text-slate-500 whitespace-nowrap">2. 마을소개</button>
+                <button onclick="switchTab(3)" id="tab-btn-3" class="flex-1 py-3 px-3 text-xs font-semibold text-slate-500 whitespace-nowrap">3. 카드뉴스</button>
+                <button onclick="switchTab(4)" id="tab-btn-4" class="flex-1 py-3 px-3 text-xs font-semibold text-slate-500 whitespace-nowrap">4. 미식체험</button>
+                <button onclick="switchTab(5)" id="tab-btn-5" class="flex-1 py-3 px-3 text-xs font-semibold text-slate-500 whitespace-nowrap">5. 나눔관</button>
+            </div>
+
+            <!-- 탭 내용 영역 -->
+            <div class="p-4 flex-grow overflow-y-auto max-h-[60vh]">
+                
+                <!-- 챕터 1: 역사관 -->
+                <div id="tab-content-1" class="space-y-4">
+                    <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                        <h3 class="font-bold text-indigo-900 text-sm">📜 우리의 아픈 손가락, 고려인 이야기</h3>
+                        <p class="text-xs text-indigo-700 mt-1">
+                            나라를 잃고 연해주로 터전을 옮겼던 우리 조상들은 1937년 스탈린의 강제 이주 정책으로 중앙아시아의 황무지에 버려졌습니다. 하지만 낯선 땅에서도 한글을 가르치고 우리말을 지켜낸 자랑스러운 동포들의 역사를 기억합시다.
+                        </p>
+                    </div>
+
+                    <!-- 객관식 5문항 -->
+                    <div class="space-y-3 text-xs">
+                        <p class="font-bold text-slate-700">📌 [객관식 퀴즈]</p>
+                        <div>
+                            <p>1. 고려인들이 처음으로 대규모로 이주했던 지역은 어디인가요?</p>
+                            <label><input type="radio" name="q1" value="1"> ① 연해주</label> <label class="ml-2"><input type="radio" name="q1" value="0"> ② 하와이</label>
+                        </div>
+                        <div>
+                            <p>2. 고려인들이 중앙아시아로 강제 이주를 당한 연도는 언제인가요?</p>
+                            <label><input type="radio" name="q2" value="0"> ① 1919년</label> <label class="ml-2"><input type="radio" name="q2" value="1"> ② 1937년</label>
+                        </div>
+                        <div>
+                            <p>3. 강제 이주 당시 고려인들이 주로 실려간 교통수단은 무엇인가요?</p>
+                            <label><input type="radio" name="q3" value="1"> ① 화물열차(가축 운반열차)</label> <label class="ml-2"><input type="radio" name="q3" value="0"> ② 여객선</label>
+                        </div>
+                        <div>
+                            <p>4. 중앙아시아의 황무지에 버려진 고려인들이 가장먼저 개간한 작물은 무엇인가요?</p>
+                            <label><input type="radio" name="q4" value="1"> ① 벼(쌀)</label> <label class="ml-2"><input type="radio" name="q4" value="0"> ② 밀</label>
+                        </div>
+                        <div>
+                            <p>5. 낯선 땅에서도 고려인들이 끝까지 지키고자 했던 우리의 소중한 자산은?</p>
+                            <label><input type="radio" name="q5" value="1"> ① 한글과 우리말</label> <label class="ml-2"><input type="radio" name="q5" value="0"> ② 전통 무기</label>
+                        </div>
+                    </div>
+
+                    <!-- 주관식 5문항 -->
+                    <div class="space-y-3 text-xs pt-3 border-t">
+                        <p class="font-bold text-slate-700">📌 [주관식 심화 퀴즈]</p>
+                        <div><label class="block mb-1">1. 고려인들이 연해주에서 한인 마을을 형성하며 살아가던 중 겪게 된 가장 큰 정치적 시련은 무엇이었나요?</label><input type="text" id="sq1" class="w-full border p-2 rounded"></div>
+                        <div><label class="block mb-1">2. 1937년 강제 이주 당시 중앙아시아(카자흐스탄, 우즈베키스탄 등)의 기후와 환경은 어떠했나요?</label><input type="text" id="sq2" class="w-full border p-2 rounded"></div>
+                        <div><label class="block mb-1">3. 강제 이주 열차 속에서 고려인 선조들이 서로를 위로하며 끝까지 지켜내고자 한 민족적 정체성은 무엇인가요?</label><input type="text" id="sq3" class="w-full border p-2 rounded"></div>
+                        <div><label class="block mb-1">4. 중앙아시아 정착 초기, 황무지 개간 과정에서 고려인들이 발휘한 끈기와 협동심의 의미를 적어보세요.</label><input type="text" id="sq4" class="w-full border p-2 rounded"></div>
+                        <div><label class="block mb-1">5. 오늘날 우리가 고려인 동포들의 역사에 대해 반드시 기억하고 공감해야 하는 이유는 무엇일까요?</label><input type="text" id="sq5" class="w-full border p-2 rounded"></div>
+                    </div>
+
+                    <!-- 편지 쓰기 -->
+                    <div class="space-y-1">
+                        <label class="block text-xs font-bold text-slate-700">💌 고려인 동포들에게 전하는 마음의 편지</label>
+                        <textarea id="letter-input" rows="3" placeholder="역경을 이겨낸 고려인 후손 또는 조상들에게 전하고 싶은 위로와 응원의 글을 적어주세요." class="w-full border p-2 rounded text-xs"></textarea>
+                    </div>
+
+                    <button onclick="completeChapter(1)" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-indigo-700">
+                        역사관 미션 완료 & 뱃지 받기 🏆
+                    </button>
+                </div>
+
+                <!-- 챕터 2: 마을소개 -->
+                <div id="tab-content-2" class="hidden space-y-4 text-xs">
+                    <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
+                        <h3 class="font-bold text-emerald-900 text-sm">🏘️ 인천 함박마을 탐방 미션</h3>
+                        <p class="text-xs text-emerald-700 mt-1">러시아어 간판, 할랄 간판, 케밥 간판을 찾아 사진을 올리고 번역 및 뜻을 적어보세요.</p>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold block mb-1">① 러시아 간판 사진 & 번역 뜻</label>
+                        <input type="file" id="sign-ru" accept="image/*" class="w-full border p-1 rounded mb-1">
+                        <input type="text" id="trans-ru" placeholder="번역기 해석 내용 작성" class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1">② 할랄(Halal) 간판 사진 & 뜻 설명</label>
+                        <input type="file" id="sign-halal" accept="image/*" class="w-full border p-1 rounded mb-1">
+                        <input type="text" id="meaning-halal" placeholder="할랄(Halal)의 뜻을 적어주세요" class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1">③ 케밥(Kebab) 간판 사진 & 뜻 설명</label>
+                        <input type="file" id="sign-kebab" accept="image/*" class="w-full border p-1 rounded mb-1">
+                        <input type="text" id="meaning-kebab" placeholder="케밥(Kebab)의 뜻을 적어주세요" class="w-full border p-2 rounded">
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1">④ 우리 동네와 다른 점 및 함박마을의 인상/특징</label>
+                        <textarea id="village-diff" rows="2" placeholder="내가 사는 동네와 비교했을 때의 차이점과 느낀 점" class="w-full border p-2 rounded"></textarea>
+                    </div>
+
+                    <button onclick="completeChapter(2)" class="w-full bg-emerald-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-emerald-700">
+                        마을소개관 미션 완료 & 뱃지 받기 🏘️
+                    </button>
+                </div>
+
+                <!-- 챕터 3: 카드뉴스 -->
+                <div id="tab-content-3" class="hidden space-y-4 text-xs">
+                    <div class="bg-amber-50 p-3 rounded-lg border border-amber-100">
+                        <h3 class="font-bold text-amber-900 text-sm">🃏 카드뉴스관 & 문화 상대주의</h3>
+                        <p class="text-xs text-amber-700 mt-1">다문화 공존 기사와 카드뉴스를 읽고 생각을 남겨보세요.</p>
+                    </div>
+
+                    <div class="space-y-3 bg-slate-50 p-3 rounded border">
+                        <p class="font-bold text-amber-800">📖 참고 기사 및 개념</p>
+                        <p class="text-[11px] text-slate-600">· <b>기사 1:</b> "틀린 것이 아니라 다름이다, 다문화 사회와 문화 상대주의 태도"</p>
+                        <p class="text-[11px] text-slate-600">· <b>기사 2:</b> "인천 함박마을, 선주민과 이주민이 함께 만드는 상생의 골목"</p>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold block mb-1">카드 1~3 감상 및 나의 생각 남기기</label>
+                        <textarea id="card-review" rows="2" placeholder="다문화 공존과 문화 상대주의에 대한 나의 생각" class="w-full border p-2 rounded mb-2"></textarea>
+                        
+                        <label class="font-semibold block mb-1">📸 [모둠 미션] 문화 상대주의 표현 인증샷 업로드</label>
+                        <input type="file" id="group-photo" accept="image/*" class="w-full border p-1 rounded">
+                    </div>
+
+                    <button onclick="completeChapter(3)" class="w-full bg-amber-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-amber-700">
+                        카드뉴스관 미션 완료 & 뱃지 받기 🃏
+                    </button>
+                </div>
+
+                <!-- 챕터 4: 미식체험관 -->
+                <div id="tab-content-4" class="hidden space-y-4 text-xs">
+                    <div class="bg-rose-50 p-3 rounded-lg border border-rose-100">
+                        <h3 class="font-bold text-rose-900 text-sm">🍲 미식 체험관 (고려인 문화 품평회)</h3>
+                        <p class="text-xs text-rose-700 mt-1">음식을 만들고 맛보며 기대했던 맛과 실제 맛의 차이를 적어보세요.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="font-semibold block mb-1">🍜 고려인 국수(국시) 사진 & 품평</label>
+                            <input type="file" id="food-1" accept="image/*" class="w-full border p-1 rounded mb-1">
+                            <input type="text" id="review-1" placeholder="기대했던 맛과 실제 맛의 차이, 느낌" class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="font-semibold block mb-1">🍚 중앙아시아식 볶음밥(플롭) 사진 & 품평</label>
+                            <input type="file" id="food-2" accept="image/*" class="w-full border p-1 rounded mb-1">
+                            <input type="text" id="review-2" placeholder="기대했던 맛과 실제 맛의 차이, 느낌" class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="font-semibold block mb-1">🥖 전통 빵 & 꼬치구이(샤슬릭) 사진 및 품평</label>
+                            <input type="file" id="food-3" accept="image/*" class="w-full border p-1 rounded mb-1">
+                            <input type="text" id="review-3" placeholder="식당 전체적인 느낌 및 어색한 소통(종업원/사장님) 경험 소감" class="w-full border p-2 rounded">
+                        </div>
+                    </div>
+
+                    <button onclick="completeChapter(4)" class="w-full bg-rose-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-rose-700">
+                        미식체험관 미션 완료 & 뱃지 받기 🍲
+                    </button>
+                </div>
+
+                <!-- 챕터 5: 나눔관 -->
+                <div id="tab-content-5" class="hidden space-y-4 text-xs">
+                    <div class="bg-purple-50 p-3 rounded-lg border border-purple-100">
+                        <h3 class="font-bold text-purple-900 text-sm">✍️ 나눔관: 나의 소감과 감사의 인사</h3>
+                        <p class="text-xs text-purple-700 mt-1">오늘 전체 행사를 기획해주신 선생님과 시민단체 분들께 감사 인사를 적어보세요.</p>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold mb-1">🙏 선생님 및 시민단체 감사 인사</label>
+                        <textarea id="thanks-note" rows="2" placeholder="기획해주신 선생님, 시민단체 분들께 전하고 싶은 감사 인사" class="w-full border p-2 rounded mb-2"></textarea>
+
+                        <label class="block font-semibold mb-1">🌟 오늘 전체 행사 종합 소감문</label>
+                        <textarea id="final-review" rows="3" placeholder="함박마을 탐방, 음식 체험, 문화공연 등을 통해 느낀 최종 소감" class="w-full border p-2 rounded"></textarea>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <button onclick="submitToGoogleSheet()" class="w-full bg-purple-600 text-white py-2.5 rounded-lg text-xs font-bold hover:bg-purple-700 shadow">
+                            구글스프레드시트로 전송하기 ☁️
+                        </button>
+                        <button onclick="downloadPDF()" class="w-full bg-slate-800 text-white py-2.5 rounded-lg text-xs font-bold hover:bg-slate-900 shadow">
+                            내 활동지 PDF 저장하기 📄
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 🚨 여기에 선생님의 구글 앱 스크립트 웹 앱 주소를 입력했습니다!
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwidyfYMz_qfYhTtP1VpzwyvDwUK23kzjcxofRnHOAcHscpIZHbHHaD_OkBfG2QvvYGlQ/exec';
+
+        let userData = {};
+        let completedMissions = [false, false, false, false];
+
+        function startApp() {
+            const school = document.getElementById('school').value;
+            const grade = document.getElementById('grade').value;
+            const klass = document.getElementById('klass').value;
+            const number = document.getElementById('number').value;
+            const name = document.getElementById('name').value;
+            const character = document.querySelector('input[name="character"]:checked').value;
+
+            if (!school || !name) {
+                alert('학교와 이름을 정확히 입력해주세요!');
+                return;
+            }
+
+            userData = { school, grade, klass, number, name, character };
+            document.getElementById('user-info-display').innerText = `${name} (${grade}학년 ${klass}반) - ${character}`;
+
+            document.getElementById('step-0').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('main-content').classList.add('flex');
+        }
+
+        function switchTab(tabNum) {
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`tab-content-${i}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${i}`).className = "flex-1 py-3 px-3 text-xs font-semibold text-slate-500 whitespace-nowrap border-b-2 border-transparent";
+            }
+            document.getElementById(`tab-content-${tabNum}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabNum}`).className = "flex-1 py-3 px-3 text-xs font-bold text-indigo-600 border-b-2 border-indigo-600 whitespace-nowrap";
+        }
+
+        function completeChapter(ch) {
+            completedMissions[ch - 1] = true;
+            const badge = document.getElementById(`badge-${ch}`);
+            badge.className = "text-xs bg-emerald-500 text-white px-2 py-1 rounded font-bold shadow-sm";
+            badge.innerText += " ✔️";
+            alert(`챕터 ${ch} 미션 완료! 뱃지를 획득했습니다! 🎉`);
+            if (ch < 5) switchTab(ch + 1);
+        }
+
+        function submitToGoogleSheet() {
+            // 퀴즈 채점
+            let score = 0;
+            for(let i=1; i<=5; i++) {
+                const radios = document.getElementsByName(`q${i}`);
+                for(let r of radios) {
+                    if(r.checked && r.value === "1") score += 2;
+                }
+            }
+
+            const payload = {
+                school: userData.school,
+                grade: userData.grade,
+                klass: userData.klass,
+                number: userData.number,
+                name: userData.name,
+                character: userData.character,
+                quizScore: score + "점",
+                letter: document.getElementById('letter-input').value,
+                villageMission: document.getElementById('village-diff').value,
+                cardReview: document.getElementById('card-review').value,
+                foodReview: document.getElementById('review-3').value,
+                finalReview: document.getElementById('thanks-note').value + " / " + document.getElementById('final-review').value
+            };
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert('구글 스프레드시트로 전송이 성공적으로 완료되었습니다! ☁️✨');
+            }).catch(err => {
+                alert('전송 중 오류가 발생했습니다: ' + err);
+            });
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('main-content');
+            const opt = {
+                margin:       0.5,
+                filename:     `함박마을_탐방보고서_${userData.name || '학생'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(opt).save();
+        }
+    </script>
+</body>
+</html>
